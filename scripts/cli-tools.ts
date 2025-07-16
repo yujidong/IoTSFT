@@ -41,9 +41,9 @@ program
 program
     .command('deploy')
     .description('Deploy IoTSFT contract')
-    .option('-n, --name <name>', '合约名称', 'IoT Semi-Fungible Token')
+    .option('-n, --name <name>', 'Contract name', 'IoT Semi-Fungible Token')
     .option('-s, --symbol <symbol>', 'Contract symbol', 'IOTSFT')
-    .option('-d, --decimals <decimals>', '小数位数', '18')
+    .option('-d, --decimals <decimals>', 'Decimal places', '18')
     .action(async (options) => {
         try {
             console.log('🚀 Starting IoTSFT contract deployment...');
@@ -66,18 +66,18 @@ program
             console.log(`💡 Please update .env file: CONTRACT_ADDRESS_SEPOLIA=${contractAddress}`);
             
         } catch (error) {
-            console.error('❌ 部署失败:', error);
+            console.error('❌ Deployment failed:', error);
             process.exit(1);
         }
     });
 
-// 铸造命令
+// Mint command
 program
     .command('mint')
-    .description('铸造IoTToken')
+    .description('Mint IoT Token')
     .option('-t, --type <type>', 'DeviceType (0=Temperature sensor, 1=Crowd density sensor)', '0')
-    .option('-v, --value <value>', 'Token价值', '100')
-    .option('-r, --recipient <address>', '接收地址')
+    .option('-v, --value <value>', 'Token value', '100')
+    .option('-r, --recipient <address>', 'Recipient address')
     .action(async (options) => {
         try {
             const { contract, signer } = await getContract();
@@ -86,10 +86,10 @@ program
             const deviceType = parseInt(options.type);
             const value = parseInt(options.value);
             
-            console.log('🚀 Start铸造IoTToken...');
+            console.log('🚀 Start minting IoT Token...');
             console.log(`👤 Recipient address: ${recipient}`);
             console.log(`🔧 Device type: ${deviceType} (${deviceType === 0 ? 'Temperature sensor' : 'Crowd density sensor'})`);
-            console.log(`💰 Token价值: ${value}`);
+            console.log(`💰 Token value: ${value}`);
             
             const tx = await contract.mint(recipient, deviceType, value);
             console.log(`📝 Transaction submitted: ${tx.hash}`);
@@ -99,18 +99,18 @@ program
             console.log(`⛽ Gas used: ${receipt!.gasUsed.toString()}`);
             
         } catch (error) {
-            console.error('❌ 铸造失败:', error);
+            console.error('❌ Minting failed:', error);
             process.exit(1);
         }
     });
 
-// 分割命令
+// Split command
 program
     .command('split')
-    .description('分割IoTToken')
-    .requiredOption('-i, --tokenId <tokenId>', '要分割的TokenID')
-    .requiredOption('-a, --amount <amount>', '分割数量')
-    .requiredOption('-r, --recipient <address>', '接收新Token的地址')
+    .description('Split IoT Token')
+    .requiredOption('-i, --tokenId <tokenId>', 'Token ID to split')
+    .requiredOption('-a, --amount <amount>', 'Split amount')
+    .requiredOption('-r, --recipient <address>', 'Address to receive new token')
     .action(async (options) => {
         try {
             const { contract } = await getContract();
@@ -119,18 +119,18 @@ program
             const amount = parseInt(options.amount);
             const recipient = options.recipient;
             
-            // 检查Token信息
+            // Check token information
             const balance = await contract["balanceOf(uint256)"](tokenId);
             const slot = await contract.slotOf(tokenId);
             const owner = await contract.ownerOf(tokenId);
             
-            console.log('✂️ Start分割IoTToken...');
+            console.log('✂️ Start splitting IoT Token...');
             formatTokenInfo(tokenId, balance, slot, owner);
             console.log(`📤 Split amount: ${amount}`);
             console.log(`👤 Recipient address: ${recipient}`);
             
             if (balance < amount) {
-                console.error(`❌ 余额不足: 当前余额 ${balance.toString()}, 需要 ${amount}`);
+                console.error(`❌ Insufficient balance: Current balance ${balance.toString()}, Required ${amount}`);
                 process.exit(1);
             }
             
@@ -141,23 +141,23 @@ program
             console.log('✅ Split successful!');
             console.log(`⛽ Gas used: ${receipt!.gasUsed.toString()}`);
             
-            // 显示分割后状态
+            // Show post-split status
             const newBalance = await contract["balanceOf(uint256)"](tokenId);
-            console.log(`📊 分割后原TokenBalance: ${newBalance.toString()}`);
+            console.log(`📊 Token balance after split: ${newBalance.toString()}`);
             
         } catch (error) {
-            console.error('❌ 分割失败:', error);
+            console.error('❌ Split Failed:', error);
             process.exit(1);
         }
     });
 
-// 合并命令
+// Merge command
 program
     .command('merge')
-    .description('合并IoTToken价值')
-    .requiredOption('-f, --from <fromTokenId>', '源TokenID')
-    .requiredOption('-t, --to <toTokenId>', '目标TokenID')
-    .requiredOption('-a, --amount <amount>', '转移数量')
+    .description('Merge IoT Token value')
+    .requiredOption('-f, --from <fromTokenId>', 'Source token ID')
+    .requiredOption('-t, --to <toTokenId>', 'Target token ID')
+    .requiredOption('-a, --amount <amount>', 'Transfer amount')
     .action(async (options) => {
         try {
             const { contract } = await getContract();
@@ -166,26 +166,26 @@ program
             const toTokenId = parseInt(options.to);
             const amount = parseInt(options.amount);
             
-            // 检查Token信息
+            // Check Token Information
             const fromBalance = await contract["balanceOf(uint256)"](fromTokenId);
             const toBalance = await contract["balanceOf(uint256)"](toTokenId);
             const fromSlot = await contract.slotOf(fromTokenId);
             const toSlot = await contract.slotOf(toTokenId);
             
-            console.log('🔄 Start合并IoTToken价值...');
-            console.log('📤 源Token:');
+            console.log('🔄 Start Merge IoTToken Value...');
+            console.log('📤 Original Token:');
             formatTokenInfo(fromTokenId, fromBalance, fromSlot, await contract.ownerOf(fromTokenId));
-            console.log('📥 目标Token:');
+            console.log('📥 Target Token:');
             formatTokenInfo(toTokenId, toBalance, toSlot, await contract.ownerOf(toTokenId));
-            console.log(`💰 转移数量: ${amount}`);
+            console.log(`💰 Transfer amount: ${amount}`);
             
             if (fromSlot !== toSlot) {
-                console.error(`❌ TokenSlot不匹配: 源TokenSlot ${fromSlot.toString()}, 目标TokenSlot ${toSlot.toString()}`);
+                console.error(`❌ TokenSlot Not Match: Original TokenSlot ${fromSlot.toString()}, Target TokenSlot ${toSlot.toString()}`);
                 process.exit(1);
             }
             
             if (fromBalance < amount) {
-                console.error(`❌ 源Token余额不足: 当前余额 ${fromBalance.toString()}, 需要 ${amount}`);
+                console.error(`❌ Original Token Balance Not Enough: Current Balance ${fromBalance.toString()}, Required ${amount}`);
                 process.exit(1);
             }
             
@@ -193,42 +193,42 @@ program
             console.log(`📝 Transaction submitted: ${tx.hash}`);
             
             const receipt = await tx.wait();
-            console.log('✅ 合并成功!');
+            console.log('✅ Merge successful!');
             console.log(`⛽ Gas used: ${receipt!.gasUsed.toString()}`);
             
-            // 显示合并后状态
+            // Indicate Merge Status
             const newFromBalance = await contract["balanceOf(uint256)"](fromTokenId);
             const newToBalance = await contract["balanceOf(uint256)"](toTokenId);
-            console.log(`📊 合并后源TokenBalance: ${newFromBalance.toString()}`);
-            console.log(`📊 合并后目标TokenBalance: ${newToBalance.toString()}`);
-            
+            console.log(`📊 Merged Original TokenBalance: ${newFromBalance.toString()}`);
+            console.log(`📊 Merged Target TokenBalance: ${newToBalance.toString()}`);
+
         } catch (error) {
-            console.error('❌ 合并失败:', error);
+            console.error('❌ Merge Failed:', error);
             process.exit(1);
         }
     });
 
-// 查询命令
+// Query command
 program
     .command('info')
-    .description('查询Token或合约信息')
+    .description('Check Token or Contract Information')
     .option('-i, --tokenId <tokenId>', 'TokenID')
-    .option('-c, --contract', '显示合约信息')
+    .option('-c, --contract', 'Show Contract Information')
     .action(async (options) => {
         try {
             const { contract, contractAddress } = await getContract();
             
             if (options.contract) {
-                // 显示合约信息
-                console.log('📋 合约信息:');
-                console.log(`📍 地址: ${contractAddress}`);
-                console.log(`📝 名称: ${await contract.name()}`);
+                // Show Contract Information
+                console.log('📋 Contract Information:');
+                console.log(`📍 Address: ${contractAddress}`);
+                console.log(`📝 Name: ${await contract.name()}`);
                 console.log(`🔤 Symbol: ${await contract.symbol()}`);
-                console.log(`🔢 精度: ${await contract.valueDecimals()}`);
+                console.log(`🔢 Decimals: ${await contract.valueDecimals()}`);
                 console.log(`👤 Owner: ${await contract.owner()}`);
                 
             } else if (options.tokenId) {
-                // 显示Token信息
+                // Show Token Information
                 const tokenId = parseInt(options.tokenId);
                 
                 try {
@@ -239,29 +239,29 @@ program
                     formatTokenInfo(tokenId, balance, slot, owner);
                     
                 } catch (error) {
-                    console.error(`❌ Token #${tokenId} 不存在或查询失败`);
+                    console.error(`❌ Token #${tokenId} Not Found or Query Failed`);
                     process.exit(1);
                 }
                 
             } else {
-                console.error('❌ 请指定 --tokenId 或 --contract 参数');
+                console.error('❌ Please Specify --tokenId or --contract Parameter');
                 process.exit(1);
             }
             
         } catch (error) {
-            console.error('❌ 查询失败:', error);
+            console.error('❌ Query Failed:', error);
             process.exit(1);
         }
     });
 
-// 批量Operation命令
+// Batch Operation
 program
     .command('batch-mint')
-    .description('批量铸造Token')
-    .requiredOption('-c, --count <count>', '铸造数量')
+    .description('Match Mint Token')
+    .requiredOption('-c, --count <count>', 'Minting Count')
     .option('-t, --type <type>', 'DeviceType', '0')
-    .option('-v, --value <value>', '每个Token价值', '100')
-    .option('-r, --recipient <address>', '接收地址')
+    .option('-v, --value <value>', 'Every Token Value', '100')
+    .option('-r, --recipient <address>', 'Recipient Address')
     .action(async (options) => {
         try {
             const { contract, signer } = await getContract();
@@ -271,10 +271,10 @@ program
             const value = parseInt(options.value);
             const recipient = options.recipient || signer.address;
             
-            console.log(`🏭 Start批量铸造 ${count} 个Token...`);
+            console.log(`🏭 Start Minting ${count} Tokens...`);
             console.log(`👤 Recipient address: ${recipient}`);
             console.log(`🔧 Device type: ${deviceType}`);
-            console.log(`💰 每个Token价值: ${value}`);
+            console.log(`💰 Every Token Value: ${value}`);
             
             let totalGas = BigInt(0);
             const startTime = Date.now();
@@ -285,37 +285,37 @@ program
                 totalGas += receipt!.gasUsed;
                 
                 if ((i + 1) % 10 === 0 || i === count - 1) {
-                    console.log(`   ✅ 已铸造 ${i + 1}/${count} 个Token`);
+                    console.log(` Minted  ${i + 1}/${count} Tokens`);
                 }
             }
             
             const endTime = Date.now();
-            
-            console.log('✅ 批量铸造Complete!');
-            console.log(`⏱️ 总耗时: ${endTime - startTime}ms`);
-            console.log(`⛽ 总Gas Consumption: ${totalGas.toString()}`);
-            console.log(`📊 平均每个Token: ${(Number(totalGas) / count).toFixed(0)} Gas`);
-            
+
+            console.log('✅ Batch Minting Complete!');
+            console.log(`⏱️ Total Time: ${endTime - startTime}ms`);
+            console.log(`⛽ Total Gas Consumption: ${totalGas.toString()}`);
+            console.log(`📊 Average per Token: ${(Number(totalGas) / count).toFixed(0)} Gas`);
+
         } catch (error) {
-            console.error('❌ 批量铸造失败:', error);
+            console.error('❌ Batch Minting Failed:', error);
             process.exit(1);
         }
     });
 
-// PerformanceTest命令
+// PerformanceTest 
 program
     .command('benchmark')
-    .description('运行Performance基准Test')
-    .option('-o, --operations <operations>', 'TestOperation数量', '10')
+    .description('Run Performance Benchmark Test')
+    .option('-o, --operations <operations>', 'Test Operation Count', '10')
     .action(async (options) => {
         try {
             const { contract, signer } = await getContract();
             const operations = parseInt(options.operations);
-            
-            console.log(`🔬 StartPerformance基准Test (${operations} 个Operation)...`);
-            
-            // 准备TestData
-            console.log('📋 准备Test环境...');
+
+            console.log(`🔬 Start Performance Benchmark Test (${operations} Operations)...`);
+
+            // Prepare Test Data
+            console.log('📋 Preparing Test Environment...');
             await contract.mint(signer.address, 0, 10000);
             await contract.mint(signer.address, 1, 10000);
             
@@ -328,9 +328,9 @@ program
                 split: { times: [], gas: [] },
                 merge: { times: [], gas: [] }
             };
-            
-            // Test铸造Performance
-            console.log('🧪 Test铸造Performance...');
+
+            // Test Minting Performance
+            console.log('🧪 Test Minting Performance...');
             for (let i = 0; i < operations; i++) {
                 const start = Date.now();
                 const tx = await contract.mint(signer.address, i % 2, 100);
@@ -340,9 +340,9 @@ program
                 results.mint.times.push(end - start);
                 results.mint.gas.push(Number(receipt!.gasUsed));
             }
-            
-            // Test分割Performance
-            console.log('🧪 Test分割Performance...');
+
+            // Test Splitting Performance
+            console.log('🧪 Test Splitting Performance...');
             for (let i = 0; i < Math.min(operations, 10); i++) {
                 const start = Date.now();
                 const tx = await contract.splitValue(1, 100, signer.address);
@@ -352,9 +352,9 @@ program
                 results.split.times.push(end - start);
                 results.split.gas.push(Number(receipt!.gasUsed));
             }
-            
-            // GenerateReport
-            console.log('📊 Performance基准TestReport:');
+
+            // Generate Report
+            console.log('📊 Performance Benchmark Test Report:');
             console.log('═══════════════════════════════════════');
             
             Object.entries(results).forEach(([operation, data]) => {
@@ -364,17 +364,17 @@ program
                     const minTime = Math.min(...data.times);
                     const maxTime = Math.max(...data.times);
                     
-                    console.log(`${operation.toUpperCase()}Operation:`);
-                    console.log(`  平均时间: ${avgTime.toFixed(1)}ms`);
+                    console.log(`${operation.toUpperCase()} Operation:`);
+                    console.log(`  Average time: ${avgTime.toFixed(1)}ms`);
                     console.log(`  Time range: ${minTime}ms - ${maxTime}ms`);
-                    console.log(`  平均Gas: ${avgGas.toFixed(0)}`);
-                    console.log(`  Operation次数: ${data.times.length}`);
+                    console.log(`  Average gas: ${avgGas.toFixed(0)}`);
+                    console.log(`  Operations count: ${data.times.length}`);
                     console.log('');
                 }
             });
             
         } catch (error) {
-            console.error('❌ 基准Test失败:', error);
+            console.error('❌ Benchmark test failed:', error);
             process.exit(1);
         }
     });

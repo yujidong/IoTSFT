@@ -29,35 +29,35 @@ export class ReportGenerator {
     }
 
     /**
-     * Generate完整的PerformanceAnalysisReport
+     * Generate complete performance analysis report
      */
     async generateCompleteReport(
         testResults: ScalingTestResults, 
         charts: ChartConfig[]
     ): Promise<string> {
-        console.log('📄 StartGenerate完整PerformanceReport...');
+        console.log('📄 Starting to generate complete performance report...');
 
-        // 准备ReportData
+        // Prepare report data
         const reportData = this.prepareReportData(testResults, charts);
         
-        // 确保模板存在
+        // Ensure template exists
         await this.ensureTemplateExists();
         
-        // GenerateHTML report
-        const htmlPath = await this.generateHTML report(reportData);
+        // Generate HTML report
+        const htmlPath = await this.generateHTMLReport(reportData);
         
-        // GenerateCSV data文件
+        // Generate CSV data file
         await this.generateCSVReport(testResults);
         
-        // GenerateJSONData文件
+        // Generate JSON data file
         await this.generateJSONReport(testResults);
         
-        console.log(`✅ 完整ReportGenerateComplete: ${htmlPath}`);
+        console.log(`✅ Complete report generation finished: ${htmlPath}`);
         return htmlPath;
     }
 
     /**
-     * 准备ReportData
+     * Prepare report data
      */
     private prepareReportData(results: ScalingTestResults, charts: ChartConfig[]): ReportData {
         const recommendations = this.generateRecommendations(results);
@@ -79,53 +79,53 @@ export class ReportGenerator {
     }
 
     /**
-     * GeneratePerformanceOptimization建议
+     * Generate performance optimization recommendations
      */
     private generateRecommendations(results: ScalingTestResults): string[] {
         const recommendations: string[] = [];
         
-        // AnalysisGas Consumption
+        // Analyze gas consumption
         const avgGasByOperation = this.calculateAverageGasByOperation(results.metrics);
         const highestGasOp = Object.entries(avgGasByOperation).reduce((max, [op, gas]) => 
             gas > max.gas ? { operation: op, gas } : max, { operation: '', gas: 0 });
         
         if (highestGasOp.gas > 200000) {
-            recommendations.push(`${this.getOperationName(highestGasOp.operation)}Operation的Gas Consumption较高 (${highestGasOp.gas.toFixed(0)})，建议Optimization合约逻辑以降低Gas成本。`);
+            recommendations.push(`${this.getOperationName(highestGasOp.operation)} operation has high gas consumption (${highestGasOp.gas.toFixed(0)}), consider optimizing contract logic to reduce gas costs.`);
         }
         
-        // AnalysisResponse Time
+        // Analyze response time
         const avgTimeByOperation = this.calculateAverageTimeByOperation(results.metrics);
         const slowestOp = Object.entries(avgTimeByOperation).reduce((max, [op, time]) => 
             time > max.time ? { operation: op, time } : max, { operation: '', time: 0 });
         
         if (slowestOp.time > 5000) {
-            recommendations.push(`${this.getOperationName(slowestOp.operation)}OperationResponse Time较长 (${slowestOp.time.toFixed(1)}ms)，可能需要Optimization网络Configuration或区块链节点Performance。`);
+            recommendations.push(`${this.getOperationName(slowestOp.operation)} operation has long response time (${slowestOp.time.toFixed(1)}ms), may need to optimize network configuration or blockchain node performance.`);
         }
         
-        // AnalysisThroughput
+        // Analyze throughput
         if (results.summary.avgThroughput < 1) {
-            recommendations.push('系统整体Throughput较低，建议考虑批量Operation或并行处理来提高Performance。');
+            recommendations.push('Overall system throughput is low, consider batch operations or parallel processing to improve performance.');
         }
         
-        // Analysis规模化Performance
+        // Analyze scaling performance
         const scaleAnalysis = this.analyzeScalingPerformance(results.metrics);
         if (scaleAnalysis.degradation > 0.3) {
-            recommendations.push(`Performance随规模增长出现明显下降 (${(scaleAnalysis.degradation * 100).toFixed(1)}%)，建议实施PerformanceOptimization策略。`);
+            recommendations.push(`Performance shows significant degradation with scale increase (${(scaleAnalysis.degradation * 100).toFixed(1)}%), recommend implementing performance optimization strategies.`);
         }
         
-        // 通用建议
-        recommendations.push('建议定期进行Performance回归Test，监控合约Performance变化趋势。');
-        recommendations.push('考虑在生产环境中实施Gas费用Optimization和交易并行处理。');
+        // General recommendations
+        recommendations.push('Recommend regular performance regression testing to monitor contract performance trend changes.');
+        recommendations.push('Consider implementing gas fee optimization and transaction parallel processing in production environment.');
         
         if (recommendations.length === 2) {
-            recommendations.unshift('🎉 当前Performance表现良好，各项指标均在合理范围内。');
+            recommendations.unshift('🎉 Current performance is excellent, all metrics are within reasonable ranges.');
         }
         
         return recommendations;
     }
 
     /**
-     * Analysis规模化Performance下降
+     * Analyze scaling performance degradation
      */
     private analyzeScalingPerformance(metrics: PerformanceMetrics[]): { degradation: number } {
         const mintMetrics = metrics.filter(m => m.operation === 'mint').sort((a, b) => a.scale - b.scale);
@@ -140,7 +140,7 @@ export class ReportGenerator {
     }
 
     /**
-     * 计算各Operation平均Gas Consumption
+     * Calculate average gas consumption by operation
      */
     private calculateAverageGasByOperation(metrics: PerformanceMetrics[]): { [operation: string]: number } {
         const result: { [operation: string]: number } = {};
@@ -157,7 +157,7 @@ export class ReportGenerator {
     }
 
     /**
-     * 计算各Operation平均Response Time
+     * Calculate average response time by operation
      */
     private calculateAverageTimeByOperation(metrics: PerformanceMetrics[]): { [operation: string]: number } {
         const result: { [operation: string]: number } = {};
@@ -174,19 +174,19 @@ export class ReportGenerator {
     }
 
     /**
-     * 获取Operation名称的中文翻译
+     * Get English operation name
      */
     private getOperationName(operation: string): string {
         const names: { [key: string]: string } = {
-            'mint': '铸造',
-            'split': '分割',
-            'merge': '合并'
+            'mint': 'Mint',
+            'split': 'Split',
+            'merge': 'Merge'
         };
         return names[operation] || operation;
     }
 
     /**
-     * 确保Report模板存在
+     * Ensure report template exists
      */
     private async ensureTemplateExists(): Promise<void> {
         await fs.ensureDir(this.templatesDir);
@@ -199,7 +199,7 @@ export class ReportGenerator {
     }
 
     /**
-     * 创建Report模板
+     * Create report template
      */
     private async createReportTemplate(templatePath: string): Promise<void> {
         const template = `<!DOCTYPE html>
@@ -378,11 +378,11 @@ export class ReportGenerator {
     <div class="container">
         <div class="header">
             <h1>{{title}}</h1>
-            <div class="subtitle">Generate时间: {{timestamp}}</div>
+            <div class="subtitle">Generated: {{timestamp}}</div>
         </div>
         
         <div class="content">
-            <!-- 概览摘要 -->
+            <!-- Overview Summary -->
             <div class="section">
                 <h2>📊 Test概览</h2>
                 <div class="summary-grid">
@@ -494,9 +494,9 @@ export class ReportGenerator {
     }
 
     /**
-     * GenerateHTML report
+     * Generate HTML report
      */
-    private async generateHTML report(reportData: ReportData): Promise<string> {
+    private async generateHTMLReport(reportData: ReportData): Promise<string> {
         const templatePath = path.join(this.templatesDir, 'report-template.hbs');
         const templateContent = await fs.readFile(templatePath, 'utf8');
         
