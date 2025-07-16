@@ -121,10 +121,6 @@ npm run perf:png-custom
 │   ├── chart-generator.ts      # Chart generation
 │   ├── deploy.ts              # Deployment script
 │   └── verify.ts              # Contract verification
-├── test/
-│   ├── IoTSFT.test.ts         # Core contract tests
-│   └── performance/
-│       └── scalability.test.ts # Performance tests
 └── ignition/modules/           # Deployment modules
 ```
 

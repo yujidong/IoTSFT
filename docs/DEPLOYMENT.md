@@ -188,7 +188,7 @@ Test内容：
 
 ### 并发PerformanceTest
 ```bash
-npx hardhat test test/performance/concurrency.test.ts
+npm run perf:multi
 ```
 
 Test内容：
@@ -198,7 +198,7 @@ Test内容：
 
 ### 规模化Test
 ```bash
-npx hardhat test test/performance/scalability.test.ts
+npm run perf:multi-full
 ```
 
 Test内容：
