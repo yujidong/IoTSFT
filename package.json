@@ -1,0 +1,40 @@
+{
+  "name": "iotsft",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "build": "npx hardhat compile",
+    "test": "npx hardhat test",
+    "test:gas": "REPORT_GAS=true npx hardhat test",
+    "test:performance": "npx hardhat test test/performance/*.test.ts",
+    "deploy:local": "npx hardhat run scripts/deploy.ts --network localhost",
+    "deploy:sepolia": "npx hardhat run scripts/deploy.ts --network sepolia",
+    "deploy:mainnet": "npx hardhat run scripts/deploy.ts --network mainnet",
+    "verify:sepolia": "npx hardhat run scripts/verify.ts --network sepolia",
+    "verify:mainnet": "npx hardhat run scripts/verify.ts --network mainnet",
+    "mint": "npx hardhat run ignition/modules/mint.ts --network sepolia",
+    "split": "npx hardhat run ignition/modules/splitSFT.ts --network sepolia",
+    "transfer": "npx hardhat run ignition/modules/valueTransaction.ts --network sepolia",
+    "cli": "npx hardhat run scripts/cli-tools.ts --network sepolia --",
+    "node": "npx hardhat node",
+    "clean": "npx hardhat clean",
+    "size": "npx hardhat size-contracts",
+    "coverage": "npx hardhat coverage"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@nomicfoundation/hardhat-ethers": "^3.0.9",
+    "@nomicfoundation/hardhat-toolbox": "^6.0.0",
+    "dotenv": "^17.2.0",
+    "ethers": "^6.15.0",
+    "hardhat": "^2.25.0"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.9.0",
+    "@solvprotocol/erc-3525": "^1.5.0",
+    "commander": "^14.0.0"
+  }
+}
