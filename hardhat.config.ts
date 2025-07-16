@@ -2,7 +2,7 @@ import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
 import dotenv from "dotenv";
 
-// 加载环境变量
+// Load environment variables
 dotenv.config();
 
 const config: HardhatUserConfig = {

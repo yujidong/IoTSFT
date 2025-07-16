@@ -1,38 +1,38 @@
 import { ethers } from "hardhat";
 import dotenv from "dotenv";
 
-// 加载环境变量
+// Load environment variables
 dotenv.config();
 
 async function main() {
-    console.log("🚀 开始部署IoTSFT合约...");
+    console.log("🚀 Starting IoTSFT contract deployment...");
     
-    // 获取部署账户
+    // Get deployment account
     const [deployer] = await ethers.getSigners();
-    console.log(`👤 部署账户: ${deployer.address}`);
+    console.log(`👤 Deployment account: ${deployer.address}`);
     
-    // 检查账户余额
+    // Check account balance
     const balance = await deployer.provider.getBalance(deployer.address);
-    console.log(`💰 账户余额: ${ethers.formatEther(balance)} ETH`);
+    console.log(`💰 Account balance: ${ethers.formatEther(balance)} ETH`);
     
     if (balance < ethers.parseEther("0.01")) {
-        console.warn("⚠️  警告: 账户余额较低，可能不足以完成部署");
+        console.warn("⚠️  Warning: Account balance is low, may not be sufficient to complete deployment");
     }
     
-    // 合约构造参数
+    // Contract constructor parameters
     const contractName = "IoT Semi-Fungible Token";
     const contractSymbol = "IOTSFT";
     const decimals = 18;
     
-    console.log("📄 合约参数:");
-    console.log(`   名称: ${contractName}`);
-    console.log(`   符号: ${contractSymbol}`);
-    console.log(`   精度: ${decimals}`);
+    console.log("📄 Contract parameters:");
+    console.log(`   Name: ${contractName}`);
+    console.log(`   Symbol: ${contractSymbol}`);
+    console.log(`   Decimals: ${decimals}`);
     
-    // 获取合约工厂
+    // Get contract factory
     const IoTSFT = await ethers.getContractFactory("IoTSFT");
     
-    // 估算部署Gas费用
+    // Estimate deployment gas cost
     const deploymentData = IoTSFT.interface.encodeDeploy([contractName, contractSymbol, decimals]);
     const estimatedGas = await deployer.estimateGas({
         data: deploymentData,
@@ -41,50 +41,50 @@ async function main() {
     const gasPrice = await deployer.provider.getFeeData();
     const estimatedCost = estimatedGas * (gasPrice.gasPrice || BigInt(0));
     
-    console.log("⛽ Gas估算:");
-    console.log(`   估算Gas: ${estimatedGas.toString()}`);
-    console.log(`   Gas价格: ${ethers.formatUnits(gasPrice.gasPrice || BigInt(0), "gwei")} Gwei`);
-    console.log(`   估算费用: ${ethers.formatEther(estimatedCost)} ETH`);
+    console.log("⛽ Gas estimation:");
+    console.log(`   Estimated gas: ${estimatedGas.toString()}`);
+    console.log(`   Gas price: ${ethers.formatUnits(gasPrice.gasPrice || BigInt(0), "gwei")} Gwei`);
+    console.log(`   Estimated cost: ${ethers.formatEther(estimatedCost)} ETH`);
     
-    // 部署合约
-    console.log("📦 开始部署合约...");
+    // Deploy contract
+    console.log("📦 Starting contract deployment...");
     const iotSFT = await IoTSFT.deploy(contractName, contractSymbol, decimals);
     
-    console.log(`📝 部署交易哈希: ${iotSFT.deploymentTransaction()?.hash}`);
-    console.log("⏳ 等待部署确认...");
+    console.log(`📝 Deployment transaction hash: ${iotSFT.deploymentTransaction()?.hash}`);
+    console.log("⏳ Waiting for deployment confirmation...");
     
-    // 等待部署完成
+    // Wait for deployment completion
     await iotSFT.waitForDeployment();
     const contractAddress = await iotSFT.getAddress();
     
-    console.log("✅ 合约部署成功!");
-    console.log(`📍 合约地址: ${contractAddress}`);
+    console.log("✅ Contract deployment successful!");
+    console.log(`📍 Contract address: ${contractAddress}`);
     
-    // 验证部署
-    console.log("🔍 验证部署...");
+    // Verify deployment
+    console.log("🔍 Verifying deployment...");
     const deployedName = await iotSFT.name();
     const deployedSymbol = await iotSFT.symbol();
     const deployedDecimals = await iotSFT.valueDecimals();
     const owner = await iotSFT.owner();
     
-    console.log("📋 部署验证结果:");
-    console.log(`   名称: ${deployedName}`);
-    console.log(`   符号: ${deployedSymbol}`);
-    console.log(`   精度: ${deployedDecimals}`);
-    console.log(`   所有者: ${owner}`);
+    console.log("📋 Deployment verification results:");
+    console.log(`   Name: ${deployedName}`);
+    console.log(`   Symbol: ${deployedSymbol}`);
+    console.log(`   Decimals: ${deployedDecimals}`);
+    console.log(`   Owner: ${owner}`);
     
-    // 获取最终的Gas使用情况
+    // Get final gas usage information
     const deployTx = iotSFT.deploymentTransaction();
     if (deployTx) {
         const receipt = await deployTx.wait();
         if (receipt) {
-            console.log("📊 最终Gas使用:");
-            console.log(`   实际Gas: ${receipt.gasUsed.toString()}`);
-            console.log(`   实际费用: ${ethers.formatEther(receipt.gasUsed * receipt.gasPrice)} ETH`);
+            console.log("📊 Final gas usage:");
+            console.log(`   Actual gas: ${receipt.gasUsed.toString()}`);
+            console.log(`   Actual cost: ${ethers.formatEther(receipt.gasUsed * receipt.gasPrice)} ETH`);
         }
     }
     
-    // 保存部署信息
+    // Save deployment information
     const deploymentInfo = {
         network: await deployer.provider.getNetwork(),
         contractAddress: contractAddress,
@@ -96,19 +96,19 @@ async function main() {
         deploymentHash: deployTx?.hash,
     };
     
-    console.log("💾 部署信息:", JSON.stringify(deploymentInfo, null, 2));
+    console.log("💾 Deployment information:", JSON.stringify(deploymentInfo, null, 2));
     
-    // 提示下一步操作
-    console.log("🎯 下一步操作:");
-    console.log(`1. 更新 .env 文件中的合约地址: CONTRACT_ADDRESS_${deploymentInfo.network.name.toUpperCase()}=${contractAddress}`);
-    console.log(`2. 验证合约: npx hardhat verify --network ${deploymentInfo.network.name} ${contractAddress} "${contractName}" "${contractSymbol}" ${decimals}`);
-    console.log("3. 开始铸造测试代币");
+    // Next step operations
+    console.log("🎯 Next steps:");
+    console.log(`1. Update contract address in .env file: CONTRACT_ADDRESS_${deploymentInfo.network.name.toUpperCase()}=${contractAddress}`);
+    console.log(`2. Verify contract: npx hardhat verify --network ${deploymentInfo.network.name} ${contractAddress} "${contractName}" "${contractSymbol}" ${decimals}`);
+    console.log("3. Start minting test tokens");
 }
 
-// 异常处理
+// Error handling
 main()
     .then(() => process.exit(0))
     .catch((error) => {
-        console.error("❌ 部署失败:", error);
+        console.error("❌ Deployment failed:", error);
         process.exit(1);
     });

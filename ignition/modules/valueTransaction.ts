@@ -3,98 +3,98 @@ import dotenv from "dotenv";
 // @ts-ignore
 const IoTSFTJson = require("../../artifacts/contracts/IoTSFT.sol/IoTSFT.json");
 
-// 加载环境变量
+// Load environment variables
 dotenv.config();
 
-// 环境变量配置
+// Environment variable configuration
 const SEPOLIA_URL = process.env.SEPOLIA_URL;
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
 const CONTRACT_ADDRESS = process.env.CONTRACT_ADDRESS_SEPOLIA;
-const FROM_TOKEN_ID = 2; // 转出 Value 的代币 ID (可以通过命令行参数配置)
-const TO_TOKEN_ID = parseInt(process.env.DEFAULT_TOKEN_ID || "1"); // 接收 Value 的代币 ID
-const TRANSFER_AMOUNT = 20; // 要转移的 Value 数量 (可以通过命令行参数配置)
+const FROM_TOKEN_ID = 2; // Source token ID for value transfer (configurable via command line parameters)
+const TO_TOKEN_ID = parseInt(process.env.DEFAULT_TOKEN_ID || "1"); // Destination token ID for value receipt
+const TRANSFER_AMOUNT = 20; // Amount of value to transfer (configurable via command line parameters)
 
-// 验证必需的环境变量
+// Validate required environment variables
 if (!SEPOLIA_URL || !PRIVATE_KEY || !CONTRACT_ADDRESS) {
-    console.error("❌ 错误: 缺少必需的环境变量");
-    console.error("请检查 .env 文件是否包含: SEPOLIA_URL, PRIVATE_KEY, CONTRACT_ADDRESS_SEPOLIA");
+    console.error("❌ Error: Missing required environment variables");
+    console.error("Please check if .env file contains: SEPOLIA_URL, PRIVATE_KEY, CONTRACT_ADDRESS_SEPOLIA");
     process.exit(1);
 }
 
-// 定义 DeviceType 枚举，与智能合约保持一致
+// Define DeviceType enum, consistent with smart contract
 enum DeviceType {
     TemperatureSensor = 0,
     CrowdDensitySensor = 1
 }
 
 async function main() {
-    // 初始化 provider 和 signer
+    // Initialize provider and signer
     const provider = new JsonRpcProvider(SEPOLIA_URL!);
     const signer = new ethers.Wallet(PRIVATE_KEY!, provider);
 
-    // 初始化合约实例
+    // Initialize contract instance
     const contract = new ethers.Contract(CONTRACT_ADDRESS!, IoTSFTJson.abi, signer);
 
     try {
-        console.log("🔄 开始Value转移交易...");
-        console.log(`📍 合约地址: ${CONTRACT_ADDRESS}`);
-        console.log(`📤 源代币ID: ${FROM_TOKEN_ID}`);
-        console.log(`📥 目标代币ID: ${TO_TOKEN_ID}`);
-        console.log(`💰 转移数量: ${TRANSFER_AMOUNT}`);
+        console.log("🔄 Starting value transfer transaction...");
+        console.log(`📍 Contract address: ${CONTRACT_ADDRESS}`);
+        console.log(`📤 Source token ID: ${FROM_TOKEN_ID}`);
+        console.log(`📥 Target token ID: ${TO_TOKEN_ID}`);
+        console.log(`💰 Transfer amount: ${TRANSFER_AMOUNT}`);
         
-        // 检查源代币余额
+        // Check source token balance
         const fromBalance = await contract["balanceOf(uint256)"](FROM_TOKEN_ID);
-        console.log(`💳 源代币余额: ${fromBalance.toString()}`);
+        console.log(`💳 Source token balance: ${fromBalance.toString()}`);
         
         if (fromBalance < TRANSFER_AMOUNT) {
-            console.error(`❌ 源代币余额不足: 当前余额 ${fromBalance.toString()}, 需要 ${TRANSFER_AMOUNT}`);
+            console.error(`❌ Insufficient source token balance: current balance ${fromBalance.toString()}, required ${TRANSFER_AMOUNT}`);
             process.exit(1);
         }
         
-        // 检查两个代币是否属于同一slot
+        // Check if both tokens belong to the same slot
         const fromSlot = await contract.slotOf(FROM_TOKEN_ID);
         const toSlot = await contract.slotOf(TO_TOKEN_ID);
-        console.log(`🎰 源代币Slot: ${fromSlot.toString()}`);
-        console.log(`🎰 目标代币Slot: ${toSlot.toString()}`);
+        console.log(`🎰 Source token slot: ${fromSlot.toString()}`);
+        console.log(`🎰 Target token slot: ${toSlot.toString()}`);
         
         if (fromSlot !== toSlot) {
-            console.error(`❌ 代币Slot不匹配: 源代币Slot ${fromSlot.toString()}, 目标代币Slot ${toSlot.toString()}`);
+            console.error(`❌ Token slot mismatch: source token slot ${fromSlot.toString()}, target token slot ${toSlot.toString()}`);
             process.exit(1);
         }
         
-        // 检查目标代币当前余额
+        // Check target token current balance
         const toBalance = await contract["balanceOf(uint256)"](TO_TOKEN_ID);
-        console.log(`💳 目标代币当前余额: ${toBalance.toString()}`);
+        console.log(`💳 Target token current balance: ${toBalance.toString()}`);
         
-        // 调用 mergeValue 函数
+        // Call mergeValue function
         const tx = await contract.mergeValue(
             FROM_TOKEN_ID, 
             TO_TOKEN_ID, 
             TRANSFER_AMOUNT
         );
 
-        console.log(`📝 交易已提交: ${tx.hash}`);
-        console.log("⏳ 等待交易确认...");
+        console.log(`📝 Transaction submitted: ${tx.hash}`);
+        console.log("⏳ Waiting for transaction confirmation...");
 
-        // 等待交易确认
+        // Wait for transaction confirmation
         const receipt = await tx.wait();
-        console.log(`✅ Value转移交易已确认`);
-        console.log(`🔗 交易哈希: ${receipt.transactionHash}`);
-        console.log(`⛽ Gas使用量: ${receipt.gasUsed.toString()}`);
-        console.log(`💸 Gas费用: ${ethers.formatEther(receipt.gasUsed * receipt.gasPrice)} ETH`);
+        console.log(`✅ Value transfer transaction confirmed`);
+        console.log(`🔗 Transaction hash: ${receipt.transactionHash}`);
+        console.log(`⛽ Gas used: ${receipt.gasUsed.toString()}`);
+        console.log(`💸 Gas cost: ${ethers.formatEther(receipt.gasUsed * receipt.gasPrice)} ETH`);
         
-        // 显示转移后的状态
+        // Display post-transfer state
         const newFromBalance = await contract["balanceOf(uint256)"](FROM_TOKEN_ID);
         const newToBalance = await contract["balanceOf(uint256)"](TO_TOKEN_ID);
-        console.log(`📊 转移后源代币余额: ${newFromBalance.toString()}`);
-        console.log(`📊 转移后目标代币余额: ${newToBalance.toString()}`);
+        console.log(`📊 Source token balance after transfer: ${newFromBalance.toString()}`);
+        console.log(`📊 Target token balance after transfer: ${newToBalance.toString()}`);
     } catch (error) {
-        console.error('❌ Value转移失败:', error);
+        console.error('❌ Value transfer failed:', error);
         process.exit(1);
     }
 }
 
 main().catch((error) => {
-    console.error('发生错误:', error);
+    console.error('Error occurred:', error);
     process.exitCode = 1;
 });

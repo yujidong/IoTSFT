@@ -10,7 +10,7 @@ describe("IoTSFT", function () {
     let addr1: SignerWithAddress;
     let addr2: SignerWithAddress;
 
-    // 在每个测试用例执行前部署合约
+    // 在每 tests用例执行前部署合约
     beforeEach(async function () { 
     [owner, addr1, addr2] = await ethers.getSigners(); 
     const IoTSFTFactory = await ethers.getContractFactory("IoTSFT"); 
@@ -20,7 +20,7 @@ describe("IoTSFT", function () {
     }); 
 
 
-    // 测试合约铸造功能
+    // Test合约铸造功能
     it("Should mint a new token", async function () {
         const deviceType = 0; // TemperatureSensor
         const value = 100;
@@ -30,7 +30,7 @@ describe("IoTSFT", function () {
         expect(await iotSFT["balanceOf(uint256)"](tokenId)).to.equal(value);
     });
 
-    // 测试非合约所有者尝试铸造应该失败
+    // Test非合约所有者尝试铸造应该失败
     it("Should fail if non-owner tries to mint", async function () {
         const deviceType = 1; // CrowdDensitySensor
         const value = 50;
@@ -39,7 +39,7 @@ describe("IoTSFT", function () {
         ).to.be.rejectedWith("Ownable: caller is not the owner");
     });
 
-    // 测试 value 分拆功能
+    // Test value 分拆功能
     it("Should split value correctly", async function () {
         const deviceType = 0; // TemperatureSensor
         const initialValue = 100;
@@ -53,7 +53,7 @@ describe("IoTSFT", function () {
         expect(await iotSFT["balanceOf(uint256)"](tokenId+1)).to.equal(splitValue);
     });
 
-    // 测试 value 合并功能
+    // Test value 合并功能
     it("Should merge value correctly", async function () {
         const deviceType = 1; // CrowdDensitySensor
         const value1 = 50;

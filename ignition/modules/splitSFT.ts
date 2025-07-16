@@ -1,46 +1,83 @@
 import { ethers, JsonRpcProvider } from "ethers";
+import dotenv from "dotenv";
 // @ts-ignore
 const IoTSFTJson = require("../../artifacts/contracts/IoTSFT.sol/IoTSFT.json");
 
-// 配置项，请替换为实际值
-const SEPOLIA_URL = "https://sepolia.infura.io/v3/27be5b3ba0b04639aeae77978b18114d";
-const PRIVATE_KEY = "c55822eded57ae051e2636b694d21f3cceac5e282c5d4e8b691a9051d278d3f1";
-const CONTRACT_ADDRESS = "0x1D566738e03C97A39B0135D2b87C82Fb35950f3F";
-const TOKEN_ID = 1; // 请替换为实际要分割的代币 ID
-const RECIPIENT_ADDRESS = "0x8908865F3dc2D7D26237da944F0a2dcDC7B01859"; // 接收新代币的地址
-const SPLIT_AMOUNT = 50; // 要分割出来的价值
+// Load environment variables
+dotenv.config();
 
-// 定义 DeviceType 枚举，与智能合约保持一致
+// Environment variable configuration
+const SEPOLIA_URL = process.env.SEPOLIA_URL;
+const PRIVATE_KEY = process.env.PRIVATE_KEY;
+const CONTRACT_ADDRESS = process.env.CONTRACT_ADDRESS_SEPOLIA;
+const TOKEN_ID = parseInt(process.env.DEFAULT_TOKEN_ID || "1");
+const RECIPIENT_ADDRESS = process.env.DEFAULT_RECIPIENT_ADDRESS;
+const SPLIT_AMOUNT = parseInt(process.env.DEFAULT_SPLIT_AMOUNT || "50");
+
+// Validate required environment variables
+if (!SEPOLIA_URL || !PRIVATE_KEY || !CONTRACT_ADDRESS || !RECIPIENT_ADDRESS) {
+    console.error("❌ Error: Missing required environment variables");
+    console.error("Please check if .env file contains: SEPOLIA_URL, PRIVATE_KEY, CONTRACT_ADDRESS_SEPOLIA, DEFAULT_RECIPIENT_ADDRESS");
+    process.exit(1);
+}
+
+// Define DeviceType enum, consistent with smart contract
 enum DeviceType {
     TemperatureSensor = 0,
     CrowdDensitySensor = 1
 }
 
 async function main() {
-    // 初始化 provider 和 signer
-    const provider = new JsonRpcProvider(SEPOLIA_URL);
-    const signer = new ethers.Wallet(PRIVATE_KEY, provider);
+    // Initialize provider and signer
+    const provider = new JsonRpcProvider(SEPOLIA_URL!);
+    const signer = new ethers.Wallet(PRIVATE_KEY!, provider);
 
-    // 初始化合约实例
-    const contract = new ethers.Contract(CONTRACT_ADDRESS, IoTSFTJson.abi, signer);
+    // Initialize contract instance
+    const contract = new ethers.Contract(CONTRACT_ADDRESS!, IoTSFTJson.abi, signer);
 
     try {
-        // 调用 splitValue 函数，确保参数与合约定义一致
+        console.log("✂️ Starting IoT Token Split...");
+        console.log(`📍 Contract Address: ${CONTRACT_ADDRESS}`);
+        console.log(`🎫 Token ID: ${TOKEN_ID}`);
+        console.log(`👤 Recipient Address: ${RECIPIENT_ADDRESS}`);
+        console.log(`💰 Split Amount: ${SPLIT_AMOUNT}`);
+        
+        // Check token balance
+        const balance = await contract["balanceOf(uint256)"](TOKEN_ID);
+        console.log(`💳 Current Token Balance: ${balance.toString()}`);
+        
+        if (balance < SPLIT_AMOUNT) {
+            console.error(`❌ Insufficient Balance: Current balance ${balance.toString()}, Required ${SPLIT_AMOUNT}`);
+            process.exit(1);
+        }
+        
+        // Call splitValue function with parameters matching contract definition
         const tx = await contract.splitValue(
             TOKEN_ID, 
             SPLIT_AMOUNT, 
             RECIPIENT_ADDRESS
         );
 
-        // 等待交易确认
+        console.log(`📝 Transaction Submitted: ${tx.hash}`);
+        console.log("⏳ Waiting for transaction confirmation...");
+
+        // Wait for transaction confirmation
         const receipt = await tx.wait();
-        console.log(`分割交易已确认，交易哈希: ${receipt.transactionHash}`);
+        console.log(`✅ Split Transaction Confirmed`);
+        console.log(`🔗 Transaction Hash: ${receipt.transactionHash}`);
+        console.log(`⛽ Gas Used: ${receipt.gasUsed.toString()}`);
+        console.log(`💸 Gas Fee: ${ethers.formatEther(receipt.gasUsed * receipt.gasPrice)} ETH`);
+        
+        // Display post-split status
+        const newBalance = await contract["balanceOf(uint256)"](TOKEN_ID);
+        console.log(`📊 Post-Split Original Token Balance: ${newBalance.toString()}`);
     } catch (error) {
-        console.error('分割失败:', error);
+        console.error('❌ Split Failed:', error);
+        process.exit(1);
     }
 }
 
 main().catch((error) => {
-    console.error('发生错误:', error);
+    console.error('Error occurred:', error);
     process.exitCode = 1;
 });

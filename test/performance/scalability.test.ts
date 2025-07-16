@@ -8,7 +8,7 @@ describe("Scalability Tests", function () {
     let owner: SignerWithAddress;
     let users: SignerWithAddress[];
 
-    // 规模化测试配置
+    // Scalability test configuration
     const LARGE_BATCH_SIZE = 50;
     const MEDIUM_BATCH_SIZE = 20;
     const SMALL_BATCH_SIZE = 10;
@@ -23,12 +23,12 @@ describe("Scalability Tests", function () {
         iotSFT = await IoTSFTFactory.deploy("IoT SFT", "IOTSFT", 18);
         await iotSFT.waitForDeployment();
         
-        console.log(`🏗️ 规模化测试环境准备完成`);
+        console.log(`🏗️ Scalability test environment setup complete`);
     });
 
-    describe("大规模铸造测试", function () {
-        it("连续铸造大量代币", async function () {
-            console.log(`🏭 开始大规模铸造测试 (${LARGE_BATCH_SIZE} 个代币)...`);
+    describe("Large Scale Minting Tests", function () {
+        it("Continuous minting of large quantities of tokens", async function () {
+            console.log(`🏭 Starting large scale minting test (${LARGE_BATCH_SIZE} tokens)...`);
             const startTime = Date.now();
             
             const mintResults = [];
@@ -50,42 +50,42 @@ describe("Scalability Tests", function () {
                     deviceType: deviceType
                 });
                 
-                // 每10个代币报告一次进度
+                // Report progress every 10 tokens
                 if ((i + 1) % 10 === 0) {
-                    console.log(`   ✅ 已铸造 ${i + 1}/${LARGE_BATCH_SIZE} 个代币`);
+                    console.log(`   ✅ Minted ${i + 1}/${LARGE_BATCH_SIZE} tokens`);
                 }
             }
             
             const endTime = Date.now();
             const totalDuration = endTime - startTime;
             
-            console.log(`📊 大规模铸造结果:`);
-            console.log(`   代币数量: ${LARGE_BATCH_SIZE}`);
-            console.log(`   总耗时: ${totalDuration}ms`);
-            console.log(`   平均每个代币: ${(totalDuration / LARGE_BATCH_SIZE).toFixed(1)}ms`);
-            console.log(`   总Gas消耗: ${totalGasUsed.toString()}`);
-            console.log(`   平均Gas消耗: ${(Number(totalGasUsed) / LARGE_BATCH_SIZE).toFixed(0)}`);
+            console.log(`📊 Large scale minting results:`);
+            console.log(`   Token count: ${LARGE_BATCH_SIZE}`);
+            console.log(`   Total duration: ${totalDuration}ms`);
+            console.log(`   Average per token: ${(totalDuration / LARGE_BATCH_SIZE).toFixed(1)}ms`);
+            console.log(`   Total gas consumption: ${totalGasUsed.toString()}`);
+            console.log(`   Average gas consumption: ${(Number(totalGasUsed) / LARGE_BATCH_SIZE).toFixed(0)}`);
             
-            // 验证所有代币都被正确铸造
+            // Verify all tokens were minted correctly
             for (let i = 0; i < LARGE_BATCH_SIZE; i++) {
                 const balance = await iotSFT["balanceOf(uint256)"](i + 1);
                 expect(balance).to.equal(100 + (i * 10));
             }
             
-            // 性能基准检查
-            expect(totalDuration).to.be.lessThan(120000); // 总耗时应少于2分钟
+            // Performance benchmark checks
+            expect(totalDuration).to.be.lessThan(120000); // Total duration should be less than 2 minutes
             const avgGasPerToken = Number(totalGasUsed) / LARGE_BATCH_SIZE;
-            expect(avgGasPerToken).to.be.lessThan(250000); // 平均Gas应合理
+            expect(avgGasPerToken).to.be.lessThan(250000); // Average gas should be reasonable
         });
 
-        it("不同设备类型的规模化铸造对比", async function () {
-            console.log("🔄 设备类型规模化铸造对比测试...");
+        it("Device type scalability minting comparison", async function () {
+            console.log("🔄 Device type scalability minting comparison test...");
             
             const deviceTypes = [0, 1]; // TemperatureSensor, CrowdDensitySensor
             const results: any = {};
             
             for (const deviceType of deviceTypes) {
-                console.log(`   测试设备类型 ${deviceType}...`);
+                console.log(`   Testing device type ${deviceType}...`);
                 const startTime = Date.now();
                 let totalGas = BigInt(0);
                 
@@ -107,27 +107,27 @@ describe("Scalability Tests", function () {
                 };
             }
             
-            console.log(`📊 设备类型对比结果:`);
+            console.log(`📊 Device type comparison results:`);
             deviceTypes.forEach(type => {
-                console.log(`   设备类型 ${type}:`);
-                console.log(`     耗时: ${results[type].duration}ms`);
-                console.log(`     平均Gas: ${results[type].avgGas.toFixed(0)}`);
+                console.log(`   Device type ${type}:`);
+                console.log(`     Duration: ${results[type].duration}ms`);
+                console.log(`     Average gas: ${results[type].avgGas.toFixed(0)}`);
             });
             
-            // 验证不同设备类型的性能差异应该很小
+            // Verify that performance differences between device types should be minimal
             const gasRatio = results[0].avgGas / results[1].avgGas;
-            expect(gasRatio).to.be.closeTo(1.0, 0.1); // Gas消耗差异应小于10%
+            expect(gasRatio).to.be.closeTo(1.0, 0.1); // Gas consumption difference should be less than 10%
         });
     });
 
-    describe("大规模分割测试", function () {
+    describe("Large-scale splitting test", function () {
         beforeEach(async function () {
-            // 准备一个大价值代币用于分割测试
+            // Prepare a high-value token for splitting test
             await iotSFT.connect(owner).mint(users[0].address, 0, 10000);
         });
 
-        it("连续分割大量次数", async function () {
-            console.log(`✂️ 开始大规模分割测试...`);
+        it("Multiple consecutive splits", async function () {
+            console.log(`✂️ Starting large-scale splitting test...`);
             const startTime = Date.now();
             
             const splitCount = 30;
@@ -142,10 +142,10 @@ describe("Scalability Tests", function () {
                 totalGas += receipt!.gasUsed;
                 
                 if ((i + 1) % 5 === 0) {
-                    console.log(`   ✅ 已分割 ${i + 1}/${splitCount} 次`);
+                    console.log(`   ✅ Completed split ${i + 1}/${splitCount}`);
                 }
                 
-                // 验证原代币余额递减
+                // Verify original token balance decreases
                 const remainingBalance = await iotSFT["balanceOf(uint256)"](1);
                 const expectedBalance = 10000 - (splitAmount * (i + 1));
                 expect(remainingBalance).to.equal(expectedBalance);
@@ -153,21 +153,21 @@ describe("Scalability Tests", function () {
             
             const endTime = Date.now();
             
-            console.log(`📊 大规模分割结果:`);
-            console.log(`   分割次数: ${splitCount}`);
+            console.log(`📊 Large-scale splitting results:`);
+            console.log(`   Split count: ${splitCount}`);
             console.log(`   总耗时: ${endTime - startTime}ms`);
             console.log(`   平均每次分割: ${((endTime - startTime) / splitCount).toFixed(1)}ms`);
-            console.log(`   平均Gas消耗: ${(Number(totalGas) / splitCount).toFixed(0)}`);
+            console.log(`   平均Gas Consumption: ${(Number(totalGas) / splitCount).toFixed(0)}`);
             
-            // 验证生成了正确数量的新代币
+            // 验证Generate了正确数量的新代币
             for (let i = 2; i <= splitCount + 1; i++) {
                 const balance = await iotSFT["balanceOf(uint256)"](i);
                 expect(balance).to.equal(splitAmount);
             }
         });
 
-        it("分割操作的Gas消耗趋势分析", async function () {
-            console.log("📈 分割操作Gas消耗趋势分析...");
+        it("分割Operation的Gas Consumption趋势Analysis", async function () {
+            console.log("📈 分割OperationGas Consumption趋势Analysis...");
             
             const splitCount = 15;
             const gasHistory: number[] = [];
@@ -178,8 +178,8 @@ describe("Scalability Tests", function () {
                 gasHistory.push(Number(receipt!.gasUsed));
             }
             
-            // 分析Gas消耗趋势
-            console.log(`📊 Gas消耗趋势:`);
+            // AnalysisGas Consumption趋势
+            console.log(`📊 Gas Consumption趋势:`);
             console.log(`   第1次分割: ${gasHistory[0]} Gas`);
             console.log(`   第${splitCount}次分割: ${gasHistory[splitCount - 1]} Gas`);
             
@@ -192,14 +192,14 @@ describe("Scalability Tests", function () {
             console.log(`   最小Gas: ${minGas}`);
             console.log(`   Gas变化幅度: ${((maxGas - minGas) / avgGas * 100).toFixed(1)}%`);
             
-            // 验证Gas消耗相对稳定
+            // 验证Gas Consumption相对稳定
             expect((maxGas - minGas) / avgGas).to.be.lessThan(0.15); // 变化幅度应小于15%
         });
     });
 
-    describe("复杂操作序列测试", function () {
-        it("大规模混合操作序列", async function () {
-            console.log("🔀 开始大规模混合操作序列测试...");
+    describe("复杂Operation序列Test", function () {
+        it("大规模混合Operation序列", async function () {
+            console.log("🔀 Start大规模混合Operation序列Test...");
             
             const operationCount = 50;
             const results = {
@@ -217,11 +217,11 @@ describe("Scalability Tests", function () {
             const startTime = Date.now();
             
             for (let i = 0; i < operationCount; i++) {
-                const operationType = i % 3; // 循环执行三种操作
+                const operationType = i % 3; // 循环执行三种Operation
                 
                 try {
                     if (operationType === 0) {
-                        // 铸造操作
+                        // 铸造Operation
                         const tx = await iotSFT.connect(owner).mint(
                             users[i % users.length].address, 
                             i % 2, 
@@ -232,7 +232,7 @@ describe("Scalability Tests", function () {
                         results.mint.totalGas += receipt!.gasUsed;
                         
                     } else if (operationType === 1) {
-                        // 分割操作
+                        // 分割Operation
                         const tokenId = (i % 10) + 1; // 使用前面铸造的代币
                         const tx = await iotSFT.connect(users[0]).splitValue(
                             tokenId, 
@@ -244,7 +244,7 @@ describe("Scalability Tests", function () {
                         results.split.totalGas += receipt!.gasUsed;
                         
                     } else {
-                        // 合并操作
+                        // 合并Operation
                         const fromTokenId = (i % 5) + 1;
                         const toTokenId = ((i + 1) % 5) + 1;
                         
@@ -265,34 +265,34 @@ describe("Scalability Tests", function () {
                     }
                     
                     if ((i + 1) % 10 === 0) {
-                        console.log(`   ✅ 已完成 ${i + 1}/${operationCount} 个操作`);
+                        console.log(`   ✅ 已Complete ${i + 1}/${operationCount} 个Operation`);
                     }
                     
                 } catch (error) {
-                    console.log(`   ⚠️ 操作 ${i + 1} 失败: ${error}`);
+                    console.log(`   ⚠️ Operation ${i + 1} 失败: ${error}`);
                 }
             }
             
             const endTime = Date.now();
             
-            console.log(`📊 混合操作序列结果:`);
+            console.log(`📊 混合Operation序列Result:`);
             console.log(`   总耗时: ${endTime - startTime}ms`);
-            console.log(`   铸造操作: ${results.mint.count} 次, 平均Gas: ${results.mint.count > 0 ? (Number(results.mint.totalGas) / results.mint.count).toFixed(0) : 0}`);
-            console.log(`   分割操作: ${results.split.count} 次, 平均Gas: ${results.split.count > 0 ? (Number(results.split.totalGas) / results.split.count).toFixed(0) : 0}`);
-            console.log(`   合并操作: ${results.merge.count} 次, 平均Gas: ${results.merge.count > 0 ? (Number(results.merge.totalGas) / results.merge.count).toFixed(0) : 0}`);
+            console.log(`   铸造Operation: ${results.mint.count} 次, 平均Gas: ${results.mint.count > 0 ? (Number(results.mint.totalGas) / results.mint.count).toFixed(0) : 0}`);
+            console.log(`   分割Operation: ${results.split.count} 次, 平均Gas: ${results.split.count > 0 ? (Number(results.split.totalGas) / results.split.count).toFixed(0) : 0}`);
+            console.log(`   合并Operation: ${results.merge.count} 次, 平均Gas: ${results.merge.count > 0 ? (Number(results.merge.totalGas) / results.merge.count).toFixed(0) : 0}`);
             
             const totalOperations = results.mint.count + results.split.count + results.merge.count;
-            expect(totalOperations).to.be.greaterThan(operationCount * 0.8); // 至少80%操作成功
+            expect(totalOperations).to.be.greaterThan(operationCount * 0.8); // 至少80%Operation成功
         });
     });
 
-    describe("压力测试", function () {
+    describe("压力Test", function () {
         it("极限条件下的系统稳定性", async function () {
-            console.log("🔥 开始压力测试...");
+            console.log("🔥 Start压力Test...");
             
             const stressOperations = [];
             
-            // 创建大量并发操作
+            // 创建大量并发Operation
             for (let i = 0; i < STRESS_TEST_SIZE; i++) {
                 const operationType = i % 4;
                 
@@ -316,29 +316,29 @@ describe("Scalability Tests", function () {
                 }
             }
             
-            console.log(`   执行 ${stressOperations.length} 个并发操作...`);
+            console.log(`   执行 ${stressOperations.length} 个并发Operation...`);
             const startTime = Date.now();
             
             const results = await Promise.allSettled(stressOperations);
             const endTime = Date.now();
             
-            // 分析压力测试结果
+            // Analysis压力TestResult
             const successful = results.filter(r => 
                 r.status === 'fulfilled' && r.value.success
             ).length;
             const failed = results.length - successful;
             
-            console.log(`📊 压力测试结果:`);
-            console.log(`   总操作数: ${results.length}`);
-            console.log(`   成功操作: ${successful}`);
-            console.log(`   失败操作: ${failed}`);
-            console.log(`   成功率: ${(successful / results.length * 100).toFixed(1)}%`);
+            console.log(`📊 压力TestResult:`);
+            console.log(`   总Operation数: ${results.length}`);
+            console.log(`   成功Operation: ${successful}`);
+            console.log(`   失败Operation: ${failed}`);
+            console.log(`   Success Rate: ${(successful / results.length * 100).toFixed(1)}%`);
             console.log(`   总耗时: ${endTime - startTime}ms`);
-            console.log(`   平均操作时间: ${((endTime - startTime) / results.length).toFixed(1)}ms`);
+            console.log(`   平均Operation时间: ${((endTime - startTime) / results.length).toFixed(1)}ms`);
             
-            // 压力测试基本要求
+            // 压力Test基本要求
             expect(successful).to.be.greaterThan(0);
-            expect(successful / results.length).to.be.greaterThan(0.5); // 至少50%成功率
+            expect(successful / results.length).to.be.greaterThan(0.5); // 至少50%Success Rate
         });
     });
 });

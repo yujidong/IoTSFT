@@ -2,7 +2,7 @@
 
 ## 项目概述
 
-IoTSFT是一个基于ERC-3525标准的半同质化代币(SFT)智能合约项目，专为物联网设备价值表示和交易而设计。支持IoT设备代币的铸造、分割和合并操作。
+IoTSFT是一个基于ERC-3525标准的半同质化代币(SFT)Smart Contract项目，专为物联网Device价值表示和交易而设计。支持IoTDevice代币的铸造、分割和合并Operation。
 
 ## 环境要求
 
@@ -12,13 +12,13 @@ IoTSFT是一个基于ERC-3525标准的半同质化代币(SFT)智能合约项目�
 - Git
 
 ### 区块链环境
-- Sepolia测试网络账户（需要测试ETH）
+- SepoliaTest网络账户（需要TestETH）
 - Infura/Alchemy/QuickNode API密钥
 - Etherscan API密钥（用于合约验证）
 
-## 快速开始
+## 快速Start
 
-### 1. 项目初始化
+### 1. 项目Initialize
 
 ```bash
 # 克隆项目
@@ -32,27 +32,27 @@ npm install
 npm run build
 ```
 
-### 2. 环境配置
+### 2. 环境Configuration
 
 复制环境变量模板：
 ```bash
 cp .env.example .env
 ```
 
-编辑 `.env` 文件，配置以下参数：
+编辑 `.env` 文件，Configuration以下参数：
 
 ```bash
-# 网络配置
+# 网络Configuration
 SEPOLIA_URL=https://sepolia.infura.io/v3/YOUR_PROJECT_ID
 MAINNET_URL=https://mainnet.infura.io/v3/YOUR_PROJECT_ID
 
-# 私钥配置（请使用测试账户）
+# 私钥Configuration（请使用Test账户）
 PRIVATE_KEY=your_private_key_here
 
 # Etherscan API密钥
 ETHERSCAN_API_KEY=your_etherscan_api_key_here
 
-# 测试配置
+# Test configuration
 DEFAULT_RECIPIENT_ADDRESS=0x8908865F3dc2D7D26237da944F0a2dcDC7B01859
 ```
 
@@ -61,22 +61,22 @@ DEFAULT_RECIPIENT_ADDRESS=0x8908865F3dc2D7D26237da944F0a2dcDC7B01859
 - 不要将 `.env` 文件提交到版本控制
 - 生产环境使用专用的部署账户
 
-### 3. 运行测试
+### 3. 运行Test
 
 ```bash
-# 运行基本测试
+# 运行基本Test
 npm test
 
-# 运行Gas效率测试
+# 运行GasEfficiencyTest
 npm run test:gas
 
-# 运行性能测试
+# 运行PerformanceTest
 npm run test:performance
 ```
 
 ## 部署指南
 
-### 本地部署（开发测试）
+### 本地部署（开发Test）
 
 1. **启动本地网络**：
 ```bash
@@ -88,10 +88,10 @@ npm run node
 npm run deploy:local
 ```
 
-### Sepolia测试网部署
+### SepoliaTest网部署
 
 1. **确保账户有足够ETH**：
-   - 访问 [Sepolia Faucet](https://sepoliafaucet.com/) 获取测试ETH
+   - 访问 [Sepolia Faucet](https://sepoliafaucet.com/) 获取TestETH
    - 至少需要 0.01 ETH 用于部署
 
 2. **部署合约**：
@@ -115,7 +115,7 @@ CONTRACT_ADDRESS_SEPOLIA=0xYourContractAddress
 ⚠️ **主网部署需要特别谨慎**
 
 1. **准备工作**：
-   - 确保充分测试
+   - 确保充分Test
    - 准备足够的ETH（建议至少0.1 ETH）
    - 使用专用的生产账户
    - 设置适当的Gas价格
@@ -132,7 +132,7 @@ npm run verify:mainnet
 
 ## 使用指南
 
-### 基本操作
+### 基本Operation
 
 #### 铸造代币
 ```bash
@@ -162,66 +162,66 @@ npm run cli info --contract
 npm run cli info --tokenId 1
 ```
 
-### 批量操作
+### 批量Operation
 
 #### 批量铸造
 ```bash
 npm run cli batch-mint --count 10 --type 0 --value 100
 ```
 
-#### 性能基准测试
+#### Performance基准Test
 ```bash
 npm run cli benchmark --operations 20
 ```
 
-## 性能测试
+## PerformanceTest
 
-### Gas效率测试
+### GasEfficiencyTest
 ```bash
 npm run test:gas
 ```
 
-测试内容：
-- 各操作的Gas消耗基准
-- 批量操作的效率分析
-- Gas消耗趋势分析
+Test内容：
+- 各Operation的Gas Consumption基准
+- 批量Operation的EfficiencyAnalysis
+- Gas Consumption趋势Analysis
 
-### 并发性能测试
+### 并发PerformanceTest
 ```bash
 npx hardhat test test/performance/concurrency.test.ts
 ```
 
-测试内容：
-- 多用户并发操作
+Test内容：
+- 多用户并发Operation
 - 网络拥堵模拟
-- 混合操作性能
+- 混合OperationPerformance
 
-### 规模化测试
+### 规模化Test
 ```bash
 npx hardhat test test/performance/scalability.test.ts
 ```
 
-测试内容：
-- 大规模铸造测试
-- 连续分割测试
-- 压力测试
+Test内容：
+- 大规模铸造Test
+- 连续分割Test
+- 压力Test
 
-## 监控和分析
+## 监控和Analysis
 
-### Gas费用分析
+### Gas费用Analysis
 
-每个操作的预期Gas消耗：
+每个Operation的预期Gas Consumption：
 - **部署**: ~2,500,000 Gas
 - **铸造**: ~200,000 Gas
 - **分割**: ~250,000 Gas
 - **合并**: ~150,000 Gas
 
-### 性能基准
+### Performance基准
 
-在Sepolia测试网的典型性能：
+在SepoliaTest网的典型Performance：
 - 交易确认时间: 15-30秒
-- 并发操作成功率: >90%
-- 大规模操作稳定性: 支持连续50+操作
+- 并发OperationSuccess Rate: >90%
+- 大规模Operation稳定性: 支持连续50+Operation
 
 ## 故障排除
 
@@ -229,7 +229,7 @@ npx hardhat test test/performance/scalability.test.ts
 
 #### 1. "insufficient funds for gas"
 **原因**: 账户ETH余额不足
-**解决**: 从水龙头获取更多测试ETH
+**解决**: 从水龙头获取更多TestETH
 
 #### 2. "nonce too low"
 **原因**: 交易nonce冲突
@@ -266,27 +266,27 @@ npx hardhat console --network sepolia
 ### 私钥管理
 - 使用环境变量存储私钥
 - 生产环境使用硬件钱包
-- 定期轮换测试账户
+- 定期轮换Test账户
 - 避免在日志中暴露敏感信息
 
-### 智能合约安全
-- 充分测试所有功能
+### Smart Contract安全
+- 充分Test所有功能
 - 进行安全审计
 - 监控异常交易
 - 实施访问控制
 
 ### 部署安全
 - 验证部署参数
-- 测试网完整验证
+- Test网完整验证
 - 渐进式主网部署
 - 建立监控机制
 
 ## API参考
 
-### 智能合约方法
+### Smart Contract方法
 
 #### mint(address to, DeviceType deviceType, uint256 value)
-铸造新的IoT设备代币
+铸造新的IoTDevice代币
 
 #### splitValue(uint256 tokenId, uint256 amount, address to)
 分割代币价值
@@ -305,10 +305,10 @@ npm run cli --help
 
 ### v1.0.0 (当前版本)
 - 实现基本的ERC-3525功能
-- 支持两种设备类型（温度传感器、人群密度传感器）
-- 完整的测试套件
+- 支持两 device types（温度传感器、人群密度传感器）
+- 完整的Test套件
 - CLI工具集成
-- 性能优化
+- PerformanceOptimization
 
 ## 贡献指南
 

@@ -15,3 +15,28 @@ node_modules
 
 # Hardhat Ignition default folder for deployments against a local node
 ignition/deployments/chain-31337
+
+# Performance reports and generated documentation files
+performance-reports/
+*.png
+*.html
+*.csv
+*.json
+!package.json
+!package-lock.json
+!hardhat.config.json
+!tsconfig.json
+!jest.config.json
+
+# Temporary documentation files
+COMPLETION_SUMMARY.md
+DEVICE_SCALABILITY_ANALYSIS.md
+DEVICE_SCALABILITY_REPORT.md
+OPERATIONS_PERFORMANCE_GUIDE.md
+PNG_GENERATION_GUIDE.md
+PROJECT_CLEANUP_COMPLETED.md
+PROJECT_CLEANUP_PLAN.md
+SYSTEM_CONSTRAINTS_ANALYSIS.md
+THROUGHPUT_ANALYSIS.md
+TRANSLATION_AND_BUGFIX_COMPLETION.md
+.tasks/

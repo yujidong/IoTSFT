@@ -1,53 +1,53 @@
 import { run } from "hardhat";
 import dotenv from "dotenv";
 
-// 加载环境变量
+// Load environment variables
 dotenv.config();
 
 async function main() {
-    // 从环境变量或命令行参数获取合约地址
+    // Get contract address from environment variable or command line argument
     const contractAddress = process.env.CONTRACT_ADDRESS_SEPOLIA || process.argv[2];
     
     if (!contractAddress) {
-        console.error("❌ 错误: 未提供合约地址");
-        console.error("使用方法:");
-        console.error("1. 在 .env 文件中设置 CONTRACT_ADDRESS_SEPOLIA");
-        console.error("2. 或通过命令行参数: npx hardhat run scripts/verify.ts --network sepolia 0x...");
+        console.error("❌ Error: Contract address not provided");
+        console.error("Usage:");
+        console.error("1. Set CONTRACT_ADDRESS_SEPOLIA in .env file");
+        console.error("2. Or via command line: npx hardhat run scripts/verify.ts --network sepolia 0x...");
         process.exit(1);
     }
     
-    // 合约构造参数 (必须与部署时完全一致)
+    // Contract constructor parameters (must match exactly with deployment)
     const contractName = "IoT Semi-Fungible Token";
     const contractSymbol = "IOTSFT";
     const decimals = 18;
     
-    console.log("🔍 开始验证合约...");
-    console.log(`📍 合约地址: ${contractAddress}`);
-    console.log(`📄 构造参数: ["${contractName}", "${contractSymbol}", ${decimals}]`);
+    console.log("🔍 Starting contract verification...");
+    console.log(`📍 Contract address: ${contractAddress}`);
+    console.log(`📄 Constructor parameters: ["${contractName}", "${contractSymbol}", ${decimals}]`);
     
     try {
-        // 验证合约
+        // Verify contract
         await run("verify:verify", {
             address: contractAddress,
             constructorArguments: [contractName, contractSymbol, decimals],
         });
         
-        console.log("✅ 合约验证成功!");
-        console.log(`🌐 在Etherscan上查看: https://sepolia.etherscan.io/address/${contractAddress}`);
+        console.log("✅ Contract verification successful!");
+        console.log(`🌐 View on Etherscan: https://sepolia.etherscan.io/address/${contractAddress}`);
         
     } catch (error: any) {
         if (error.message.toLowerCase().includes("already verified")) {
-            console.log("ℹ️  合约已经验证过了");
-            console.log(`🌐 在Etherscan上查看: https://sepolia.etherscan.io/address/${contractAddress}`);
+            console.log("ℹ️  Contract already verified");
+            console.log(`🌐 View on Etherscan: https://sepolia.etherscan.io/address/${contractAddress}`);
         } else {
-            console.error("❌ 验证失败:", error.message);
+            console.error("❌ Verification failed:", error.message);
             
-            // 提供故障排除建议
-            console.log("🔧 故障排除建议:");
-            console.log("1. 检查ETHERSCAN_API_KEY是否正确设置");
-            console.log("2. 确认合约地址是否正确");
-            console.log("3. 确认构造参数与部署时完全一致");
-            console.log("4. 等待几分钟后重试(有时需要等待区块确认)");
+            // Provide troubleshooting suggestions
+            console.log("🔧 Troubleshooting suggestions:");
+            console.log("1. Check if ETHERSCAN_API_KEY is correctly set");
+            console.log("2. Confirm contract address is correct");
+            console.log("3. Confirm constructor parameters match exactly with deployment");
+            console.log("4. Wait a few minutes and retry (sometimes needs to wait for block confirmation)");
             
             process.exit(1);
         }
@@ -57,6 +57,6 @@ async function main() {
 main()
     .then(() => process.exit(0))
     .catch((error) => {
-        console.error("❌ 验证过程出错:", error);
+        console.error("❌ Verification error:", error);
         process.exit(1);
     });

@@ -12,7 +12,7 @@ async function main() {
     // 部署合约并传入构造函数参数
     const ioTSFT = await IoTSFTFactory.deploy(name, symbol, decimals); 
 
-    // 等待合约部署完成
+    // 等待合约部署Complete
     await ioTSFT.waitForDeployment(); 
 
     console.log(`IoTSFT 合约已部署到地址: ${await ioTSFT.getAddress()}`); 

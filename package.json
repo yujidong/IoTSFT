@@ -15,7 +15,13 @@
     "mint": "npx hardhat run ignition/modules/mint.ts --network sepolia",
     "split": "npx hardhat run ignition/modules/splitSFT.ts --network sepolia",
     "transfer": "npx hardhat run ignition/modules/valueTransaction.ts --network sepolia",
-    "cli": "npx hardhat run scripts/cli-tools.ts --network sepolia --",
+    "perf:quick": "tsx scripts/cli-tools.ts quick-perf",
+    "perf:multi": "tsx scripts/cli-tools.ts multi-dimensional",
+    "perf:multi-small": "tsx scripts/cli-tools.ts multi-dimensional --device-types \"2,4,6\" --tokens-per-type \"20,50\"",
+    "perf:multi-full": "tsx scripts/cli-tools.ts multi-dimensional --device-types \"2,4,6,8,10,12\" --tokens-per-type \"50,100,200\" --repetitions \"5\"",
+    "perf:png-demo": "npx tsx scripts/png-demo.ts multi-dimensional --png",
+    "perf:png-quick": "npx tsx scripts/png-demo.ts chart-generator --png",
+    "perf:png-custom": "npx tsx scripts/png-demo.ts multi-dimensional --png --width 1200 --height 900",
     "node": "npx hardhat node",
     "clean": "npx hardhat clean",
     "size": "npx hardhat size-contracts",
@@ -28,13 +34,20 @@
   "devDependencies": {
     "@nomicfoundation/hardhat-ethers": "^3.0.9",
     "@nomicfoundation/hardhat-toolbox": "^6.0.0",
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^24.0.14",
+    "chart.js": "^4.5.0",
     "dotenv": "^17.2.0",
     "ethers": "^6.15.0",
-    "hardhat": "^2.25.0"
+    "fs-extra": "^11.3.0",
+    "handlebars": "^4.7.8",
+    "hardhat": "^2.25.0",
+    "tsx": "^4.20.3"
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.9.0",
     "@solvprotocol/erc-3525": "^1.5.0",
+    "chartjs-node-canvas": "^5.0.0",
     "commander": "^14.0.0"
   }
 }
